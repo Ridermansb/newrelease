@@ -1,0 +1,20 @@
+{
+  "sourceMaps" : true,
+  "presets": [
+    ["env", {
+      "modules": false,
+      "useBuiltIns": true
+    }],
+    "react"
+  ],
+  "plugins": [
+    "transform-runtime",
+    "transform-decorators-legacy",
+    "transform-class-properties",
+    "transform-object-rest-spread",
+    "es6-promise",
+    ["module-resolver", {
+      "root": ["."]
+    }]
+  ]
+}
