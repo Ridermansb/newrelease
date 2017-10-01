@@ -32,11 +32,16 @@ const RepositoriesList = ({ repository }) => (
   </a>
 );
 
+RepositoriesList.defaultProps = {
+  login: 'unknown',
+  avatar_url: '',
+};
+
 RepositoriesList.propTypes = {
   repository: PropTypes.shape({
     full_name: PropTypes.string.isRequired,
-    login: PropTypes.string.isRequired,
-    avatar_url: PropTypes.string.isRequired,
+    login: PropTypes.string,
+    avatar_url: PropTypes.string,
   }).isRequired,
 };
 

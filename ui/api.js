@@ -1,5 +1,5 @@
 
-const { GITHUB_API_URI } = process.env;
+const GITHUB_API_URI = process.env.GITHUB_API_URI;
 
 const fetchGithubHeaders = {
   Accept: 'application/vnd.github.mercy-preview+json',

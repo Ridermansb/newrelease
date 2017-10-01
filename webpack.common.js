@@ -22,6 +22,8 @@ module.exports = {
     new webpack.EnvironmentPlugin({
       NODE_ENV: 'development',
       GITHUB_API_URI: 'https://api.github.com',
+      DOMAIN: '',
+      CLIENTID: '',
     }),
     new webpack.ProvidePlugin({
       // From http://madole.xyz/using-webpack-to-set-up-polyfills-in-your-site/

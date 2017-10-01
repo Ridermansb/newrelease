@@ -1,19 +1,10 @@
 import React from 'react';
-import Menu from 'components/Menu';
 import RepositoriesList from 'components/RepositoriesList';
+import RootContainer from '../containers/RootContainer';
 
-const styles = {
-  page: {
-    marginTop: 10,
-  },
-};
-
-const HomePage = () => (<div>
-  <Menu className="top fix" />
-  <div className="ui container" style={styles.page}>
-    <RepositoriesList />
-  </div>
-</div>);
+const HomePage = () => (<RootContainer>
+  <RepositoriesList />
+</RootContainer>);
 
 HomePage.displayName = 'HomePage';
 

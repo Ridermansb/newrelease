@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import auth from '../auth';
 import logo from '../../favicon.png';
+import store from '../store';
 
 export default class extends React.PureComponent {
   static displaName = 'Menu';
@@ -13,32 +15,61 @@ export default class extends React.PureComponent {
     className: '',
   };
 
+  /*  componentDidMount() {
+    this.$dropDownUser
+      .dropdown();
+  } */
+
+  // eslint-disable-next-line class-methods-use-this
+  logoutClick() {
+    auth.logout();
+  }
+
   render() {
     const { className } = this.props;
+    const { currentUser } = store;
+
     return (<div className={`ui borderless ${className} attached stackable menu`}>
       <div className="ui container">
         <a href="/" className="header item">
-          <img src={logo} alt="Logo" className="ui avatar image" />
+          <img src={logo} alt="Logo" className="ui avatar image" /> New Release
+        </a>
+        <a href="#mine" className="active item">
+          Mine
+        </a>
+        <a href="#active" className="item">
+          Active
         </a>
         <div className="item">
           <div className="ui category small search">
             <div className="ui left icon input">
               <i className="github icon" />
-              <input className="prompt" type="text" placeholder="Add an repository..." />
+              <input className="prompt" type="text" placeholder="Search repository..." />
             </div>
             <div className="results" />
           </div>
         </div>
         <div className="right menu">
-          <div className="ui item inline dropdown">
+          <div className="item">
+            <img className="ui avatar image" src={currentUser.picture} alt="User avatar" />
+          </div>
+          <button className="ui button item" onClick={this.logoutClick} >
+            <i className="icon sign out" />
+          </button>
+          {/*
+          <div
+            className="ui item inline dropdown"
+          >
             <i className="ui avatar user icon" />
             <i className="dropdown icon" />
             <div className="menu">
-              <div className="item">
+              <button className="item" ref={((el) => { this.$dropDownUser = el; })}
+               onClick={this.logoutClick}>
                 Logout
-              </div>
+              </button>
             </div>
           </div>
+          */}
         </div>
       </div>
     </div>);
