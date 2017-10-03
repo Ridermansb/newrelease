@@ -1,9 +1,9 @@
-## Start fresh
+>  WIP
 
- * **Create [Github APP][1]**
- 
+[![Deploy to Docker Cloud](https://files.cloud.docker.com/images/deploy-to-dockercloud.svg)](https://cloud.docker.com/stack/deploy/?repo=ridermansb/newrelease)
+
  * **Create new WebTask**  
- First create a new file `.env.auth0` with all secrets (Check the `github_mine_repos`).
+ First create a new file `.env.auth0` with all secrets (Check the `webtask/github`).
    
 > *Create a profile*
    
