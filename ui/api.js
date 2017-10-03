@@ -50,3 +50,14 @@ export function getLatestReleaseRepository(owner, repo) {
     headers,
   }).then(checkStatus).then(parseJSON);
 }
+
+export function addHookToRepository(owner, repo) {
+  const token = localStorage.getItem('id_token');
+  const headers = Object.assign({}, fetchHeaders, {
+    Authorization: `Bearer ${token}`,
+  });
+  return fetch(`/api/repos/${owner}/${repo}/hooks`, {
+    method: 'POST',
+    headers,
+  }).then(checkStatus).then(parseJSON);
+}

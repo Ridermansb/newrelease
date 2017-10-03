@@ -9,19 +9,13 @@
    
     wt init -p "newrelease"    
    
-> *Proxy to get user repositories*    
+> *Create/update proxy to Github*    
    
-    wt create webtasks/github.js \
-      -p "newrelease" \
-      --secrets-file .env.auth0 \
-      --name github
+    wt create webtasks/github.js -p "newrelease" --secrets-file .env.auth0 --name github -d express-boom -d auth0
+    wt update github webtasks/github.js -p newrelease
 
 > *Run locally*
 
-    wt serve webtasks/github.js \
-      --secrets-file .env.auth0 \
-      --hostname localhost \
-      --port 3001
-
+    wt serve webtasks/github.js --secrets-file .env.auth0 --hostname localhost --port 3001
 
 [1]: https://github.com/settings/developers

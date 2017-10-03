@@ -1,8 +1,10 @@
+/* eslint-disable jsx-a11y/label-has-for */
+
 import React, { PureComponent } from 'react';
 import { autobind } from 'core-decorators';
 import PropTypes from 'prop-types';
 import moment from 'moment';
-import { getLatestReleaseRepository } from 'api';
+import { getLatestReleaseRepository, addHookToRepository } from 'api';
 import Markdown from './Markdown';
 
 const setVersionInfo = version => state => ({ ...state, version });
@@ -31,15 +33,26 @@ export default class extends PureComponent {
 
   componentDidMount() {
     const self = this;
-    this.$accordion
-      .accordion({
-        onOpening() {
-          const { releaseLoaded } = self.state;
-          if (!releaseLoaded) {
-            self.loadRelease();
-          }
-        },
-      });
+    this.$accordion.accordion({
+      onOpening() {
+        const { releaseLoaded } = self.state;
+        if (!releaseLoaded) {
+          self.loadRelease();
+        }
+      },
+    });
+
+    this.$notificationCheck.checkbox({
+      onChecked() {
+        const { repository } = self.props;
+        const { name, owner } = repository;
+        console.log('Adding hook.. ');
+        addHookToRepository(owner.login, name);
+      },
+      onUnchecked() {
+        console.log('Im NOT checked');
+      },
+    });
   }
 
   @autobind
@@ -78,9 +91,15 @@ export default class extends PureComponent {
           <div className="summary">
             <a href={repository.owner.html_url} target="_blank">{repository.owner.login}</a> &nbsp;/&nbsp;
             <a href={repository.html_url} target="_blank">{repository.name}</a>
-            <div className="date">
+            <span className="date">
               {moment(repository.pushed_at).fromNow()}
-            </div>
+            </span>
+            <span className="date">
+              <div className="ui slider checkbox" ref={(el) => { this.$notificationCheck = $(el); }}>
+                <input type="checkbox" name={`enableNotification${repository.id}`} id={`enableNotification${repository.id}`} />
+                <label htmlFor={`enableNotification${repository.id}`}>Notification</label>
+              </div>
+            </span>
           </div>
           <div className="extra text">
             {repository.description}
@@ -100,9 +119,6 @@ export default class extends PureComponent {
                 {versionDescription}
               </div>
             </div>
-          </div>
-          <div className="meta">
-            <span className="ui yellow empty circular label" /> {repository.language}
           </div>
         </div>
       </div>
