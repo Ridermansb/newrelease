@@ -12,7 +12,7 @@ export class Auth {
     redirectUri: 'http://localhost:3000/callback',
     audience: `https://${DOMAIN}/userinfo`,
     responseType: 'token id_token',
-    scope: 'openid profile email',
+    scope: 'openid identities profile email read:user_idp_tokens',
     theme: {
       logo: 'https://cdn2.iconfinder.com/data/icons/snipicons/500/tag-64.png',
     },

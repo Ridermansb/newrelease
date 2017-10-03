@@ -1,8 +1,9 @@
 
 const GITHUB_API_URI = process.env.GITHUB_API_URI;
 
-const fetchGithubHeaders = {
-  Accept: 'application/vnd.github.mercy-preview+json',
+const fetchHeaders = {
+  'Content-Type': 'application/json',
+  Accept: 'application/json',
 };
 
 function checkStatus(response) {
@@ -19,15 +20,33 @@ async function parseJSON(response) {
   return jsonObj;
 }
 
-export function getAllPublicRepositories() {
+export function getPublicRepositories() {
+  const headers = Object.assign({}, fetchHeaders, {
+    Accept: 'application/vnd.github.mercy-preview+json',
+  });
   return fetch(`${GITHUB_API_URI}/repositories`, {
     method: 'GET',
-    headers: fetchGithubHeaders,
+    headers,
   }).then(checkStatus).then(parseJSON);
 }
-export function getRepositories(query) {
-  return fetch(`${GITHUB_API_URI}/search/repositories?q=${query}`, {
+export function getUserRepositories() {
+  const token = localStorage.getItem('id_token');
+  const headers = Object.assign({}, fetchHeaders, {
+    Authorization: `Bearer ${token}`,
+  });
+  return fetch('/api/user/repos', {
     method: 'GET',
-    headers: fetchGithubHeaders,
+    headers,
+  }).then(checkStatus).then(parseJSON);
+}
+
+export function getLatestReleaseRepository(owner, repo) {
+  const token = localStorage.getItem('id_token');
+  const headers = Object.assign({}, fetchHeaders, {
+    Authorization: `Bearer ${token}`,
+  });
+  return fetch(`/api/repos/${owner}/${repo}/releases/latest`, {
+    method: 'GET',
+    headers,
   }).then(checkStatus).then(parseJSON);
 }

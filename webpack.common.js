@@ -16,7 +16,7 @@ require('dotenv').config();
 
 module.exports = {
   entry: {
-    vendor: ['react', 'react-dom', 'semantic-ui-css'],
+    vendor: ['react', 'react-dom', 'jquery', 'semantic-ui-css'],
   },
   plugins: [
     new webpack.EnvironmentPlugin({

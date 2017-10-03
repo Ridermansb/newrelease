@@ -1,48 +1,101 @@
-import React from 'react';
+import React, { PureComponent } from 'react';
+import { autobind } from 'core-decorators';
 import PropTypes from 'prop-types';
+import moment from 'moment';
+import { getLatestReleaseRepository } from 'api';
+import Markdown from './Markdown';
 
-const RepositoriesList = ({ repository }) => (
-  <a className="ui card" href={repository.html_url} target="_blank">
-    <div className="content">
-      <i className="right floated star icon" />
-      <div className="header">
-        {repository.full_name}
-      </div>
-      <div className="meta">
-        {repository.description}
-      </div>
-      <div className="description">
-          Elliot requested permission to view your contact details
-      </div>
-    </div>
-    {repository.owner &&
-      <div className="extra content">
-        <span className="left floated like">
-          <i className="tag icon" /> v1.2.3
-        </span>
-        <div className="right floated author">
-          <img
-            className="ui avatar image"
-            alt={repository.owner.login}
-            src={repository.owner.avatar_url}
-          /> {repository.owner.login}
+const setVersionInfo = version => state => ({ ...state, version });
+const setIsLoadingRelease = isLoadingRelease => state => ({ ...state, isLoadingRelease });
+const setReleaseLoaded = releaseLoaded => state => ({ ...state, releaseLoaded });
+
+export default class extends PureComponent {
+  static propTypes = {
+    repository: PropTypes.shape({
+      name: PropTypes.string.isRequired,
+      full_name: PropTypes.string.isRequired,
+      login: PropTypes.string,
+      avatar_url: PropTypes.string,
+    }).isRequired,
+  };
+
+  static defaultProps = {
+    login: 'unknown',
+    avatar_url: '',
+  };
+
+  state = {
+    releaseLoaded: false,
+    isLoadingRelease: false,
+  };
+
+  componentDidMount() {
+    const self = this;
+    this.$accordion
+      .accordion({
+        onOpening() {
+          const { releaseLoaded } = self.state;
+          if (!releaseLoaded) {
+            self.loadRelease();
+          }
+        },
+      });
+  }
+
+  @autobind
+  loadRelease() {
+    const { repository } = this.props;
+    const { name, owner } = repository;
+
+    this.setState(setIsLoadingRelease(true));
+    getLatestReleaseRepository(owner.login, name)
+      .then((version) => {
+        this.setState(setVersionInfo(version));
+      })
+      .finally(() => {
+        this.setState(setIsLoadingRelease(false));
+        this.setState(setReleaseLoaded(true));
+      });
+  }
+
+  render() {
+    const { repository } = this.props;
+    const { version, isLoadingRelease } = this.state;
+
+    const versionInfo = version ? (<span className="date">
+      <i className="tag icon" /> {version.name} at {moment(version.published_at).fromNow()}
+    </span>) : null;
+    const versionDescription = version
+      ? (<Markdown text={version.body} />)
+      : null;
+
+    return (
+      <div href={`#${repository.full_name}`} className="event">
+        <div className="label">
+          <img alt={repository.owner.login} src={repository.owner.avatar_url} />
+        </div>
+        <div className="content">
+          <div className="summary">
+            <a href={repository.owner.html_url} target="_blank">{repository.owner.login}</a> &nbsp;/&nbsp;
+            <a href={repository.html_url} target="_blank">{repository.name}</a>
+            <div className="date">
+              {moment(repository.pushed_at).fromNow()}
+            </div>
+          </div>
+          <div className="extra text">
+            {repository.description}
+            <div className="ui accordion" ref={(el) => { this.$accordion = $(el); }}>
+              <div className="title">
+                <i className="dropdown icon" /> Last version {versionInfo}
+              </div>
+              <div className="content">
+                {isLoadingRelease && <div className="ui active mini inline loader" />}
+                {versionDescription}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    }
-  </a>
-);
-
-RepositoriesList.defaultProps = {
-  login: 'unknown',
-  avatar_url: '',
-};
-
-RepositoriesList.propTypes = {
-  repository: PropTypes.shape({
-    full_name: PropTypes.string.isRequired,
-    login: PropTypes.string,
-    avatar_url: PropTypes.string,
-  }).isRequired,
-};
-
-export default RepositoriesList;
+    );
+  }
+}

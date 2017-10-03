@@ -3,7 +3,7 @@ module.exports = {
     browser: true,
     es6: true,
     commonjs: true,
-    jasmine: true,
+    jquery: true,
   },
   parserOptions: {
     ecmaVersion: 7,
@@ -11,7 +11,8 @@ module.exports = {
     ecmaFeatures: {'jsx': true},
   },
   globals: {
-    GITHUB_API_URI: true
+    GITHUB_API_URI: true,
+    '$': true
   },
   plugins: ['react', 'jsx-a11y']
 };
