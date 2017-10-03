@@ -84,6 +84,13 @@ export default class extends PureComponent {
           </div>
           <div className="extra text">
             {repository.description}
+          </div>
+          <div className="extra text">
+            <div className="ui horizontal small labels">
+              {repository.topics.map(t => <div className="ui label" key={t}>{t}</div>)}
+            </div>
+          </div>
+          <div className="extra text">
             <div className="ui accordion" ref={(el) => { this.$accordion = $(el); }}>
               <div className="title">
                 <i className="dropdown icon" /> Last version {versionInfo}
@@ -93,6 +100,9 @@ export default class extends PureComponent {
                 {versionDescription}
               </div>
             </div>
+          </div>
+          <div className="meta">
+            <span className="ui yellow empty circular label" /> {repository.language}
           </div>
         </div>
       </div>

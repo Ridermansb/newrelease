@@ -25,7 +25,7 @@ export default class extends PureComponent {
   render() {
     const { repositories, isLoadingRepositories } = this.state;
 
-    return (<div className="ui feed">
+    return (<div className="ui small feed">
       {isLoadingRepositories && <div className="ui active inverted dimmer">
         <div className="ui text loader">Loading repositories</div>
       </div>}
