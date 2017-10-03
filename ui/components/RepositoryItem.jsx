@@ -46,11 +46,9 @@ export default class extends PureComponent {
       onChecked() {
         const { repository } = self.props;
         const { name, owner } = repository;
-        console.log('Adding hook.. ');
         addHookToRepository(owner.login, name);
       },
       onUnchecked() {
-        console.log('Im NOT checked');
       },
     });
   }
