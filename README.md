@@ -18,4 +18,11 @@
 
     wt serve webtasks/github.js --secrets-file .env.auth0 --hostname localhost --port 3001
 
+## Design
+
+ * [Black][2] and [White][3] icons based on Twitter UI
+
+
 [1]: https://github.com/settings/developers
+[2]: https://www.iconfinder.com/iconsets/twitter-ui
+[3]: https://www.iconfinder.com/iconsets/twitter-ui-glyph

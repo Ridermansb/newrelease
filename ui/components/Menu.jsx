@@ -29,16 +29,10 @@ export default class extends React.PureComponent {
     const { className } = this.props;
     const { currentUser } = store;
 
-    return (<div className={`ui borderless ${className} attached stackable inverted menu`}>
+    return (<div className={`ui borderless ${className} attached stackable menu`}>
       <div className="ui container">
         <a href="/" className="header item">
           <img src={logo} alt="Logo" className="ui avatar image" /> New Release
-        </a>
-        <a href="#mine" className="active item">
-          Mine
-        </a>
-        <a href="#active" className="item">
-          Active
         </a>
         <div className="item">
           <div className="ui category small search">

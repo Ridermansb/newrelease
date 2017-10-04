@@ -37,7 +37,7 @@ module.exports = {
       minify: { collapseWhitespace: true },
     }),
     new FaviconsWebpackPlugin({
-      logo: resolve(__dirname, 'favicon.png'),
+      logo: resolve(__dirname, 'favicon-black.png'),
       persistentCache: true,
       icons: {
         android: false,

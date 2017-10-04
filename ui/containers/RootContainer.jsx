@@ -4,7 +4,7 @@ import Menu from 'components/Menu';
 
 const styles = {
   page: {
-    marginTop: 10,
+    marginTop: 16,
   },
 };
 
