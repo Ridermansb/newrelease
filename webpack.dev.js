@@ -9,7 +9,7 @@ const host = 'localhost';
 const port = 3000;
 
 module.exports = merge(common, {
-  devtool: 'inline-source-map',
+  devtool: 'cheap-module-eval-source-map',
   entry: [
     'babel-polyfill',
     'react-hot-loader/patch',

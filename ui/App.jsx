@@ -2,15 +2,21 @@ import React from 'react';
 import { Switch, Route, withRouter } from 'react-router-dom';
 import 'semantic-ui-css';
 import 'assets/style.css';
+import { uiStore } from 'store';
 import HomePage from './pages/HomePage';
 import CallbackPage from './pages/CallbackPage';
 import auth from './auth';
-import store from './store';
+import '../node_modules/noty/lib/noty.css';
 
 const handleAuthentication = (nextState) => {
   if (/access_token|id_token|error/.test(nextState.location.hash)) {
     auth.handleAuthentication();
   }
+};
+
+// Create Semantic API
+$.fn.api.settings.api = {
+  'search repositories': '/api/search/repositories?q={query}',
 };
 
 const App = withRouter(({ location }) => (
@@ -19,9 +25,9 @@ const App = withRouter(({ location }) => (
       exact
       path="/"
       render={(props) => {
-        if (store.isAuthenticated) {
+        if (uiStore.isAuthenticated) {
           return <HomePage {...props} />;
-        } else if (!store.isAuthenticating) {
+        } else if (!uiStore.isAuthenticating) {
           auth.login();
         }
         return null;

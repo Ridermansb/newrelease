@@ -11,12 +11,12 @@
    
 > *Create/update proxy to Github*    
    
-    wt create webtasks/github.js -p "newrelease" --secrets-file .env.auth0 --name github -d express-boom -d auth0
-    wt update github webtasks/github.js -p newrelease
+    wt create webtasks/github.js -p "newrelease" --secrets-file .env.auth0 --name github -d express-boom -d auth0 -d memory-cache
+    wt update github webtasks/github.js -p newrelease -d express-boom -d auth0 -d memory-cache
 
 > *Run locally*
 
-    wt serve webtasks/github.js --secrets-file .env.auth0 --hostname localhost --port 3001
+    wt serve webtasks/github.js --secrets-file .env.auth0 --storage-file ./storage.json --hostname localhost --port 3001
 
 ## Design
 

@@ -1,29 +1,29 @@
 import React, { PureComponent } from 'react';
-import { getUserRepositories } from 'api';
+import { domainStore } from 'store';
 import RepositoryItem from './RepositoryItem';
 
+/*
 const setRepositories = repositories => state => ({ ...state, repositories });
+*/
 const setIsLoadingRepositories = isLoadingRepositories =>
   state => ({ ...state, isLoadingRepositories });
 
 export default class extends PureComponent {
-  state = {
-    repositories: [],
-    isLoadingRepositories: true,
-  };
-
-  componentWillMount() {
-    getUserRepositories()
-      .then((repos) => {
-        this.setState(setRepositories(repos));
-      })
-      .finally(() => {
-        this.setState(setIsLoadingRepositories(false));
-      });
+  async componentWillMount() {
+    this.setState(setIsLoadingRepositories(true));
+    try {
+      await domainStore.fetchRepositories();
+    } catch (e) {
+      console.error(e);
+    } finally {
+      this.setState(setIsLoadingRepositories(false));
+    }
   }
 
   render() {
-    const { repositories, isLoadingRepositories } = this.state;
+    const { isLoadingRepositories } = this.state;
+    // const { repositories } = domainStore;
+    const repositories = [];
 
     return (<div className="ui small feed">
       {isLoadingRepositories && <div className="ui active inverted dimmer">

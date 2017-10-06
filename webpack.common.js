@@ -86,6 +86,7 @@ module.exports = {
       assets: resolve(__dirname, 'ui', 'assets'),
       components: resolve(__dirname, 'ui', 'components'),
       api$: resolve(__dirname, 'ui', 'api.js'),
+      store: resolve(__dirname, 'ui', 'store'),
     },
   },
   module: {
@@ -100,8 +101,15 @@ module.exports = {
       exclude: [resolve(__dirname, 'ui', 'index.tpl.html')],
     }, {
       test: /\.(js|jsx)$/,
-      exclude: /node_modules/,
-      use: { loader: 'babel-loader' },
+      use: {
+        loader: 'babel-loader',
+        query: {
+          cacheDirectory: true, // important for performance
+        },
+      },
+      include: [
+        resolve(__dirname, 'ui'), // important for performance!
+      ],
     }, {
       test: /\.(eot|woff|woff2|ttf|svg)$/,
       use: {

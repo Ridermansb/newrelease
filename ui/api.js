@@ -3,7 +3,15 @@ const GITHUB_API_URI = process.env.GITHUB_API_URI;
 
 const fetchHeaders = {
   'Content-Type': 'application/json',
-  Accept: 'application/json',
+};
+
+const getWebtaskHeaders = () => {
+  const token = localStorage.getItem('id_token');
+  return Object.assign({}, fetchHeaders, {
+    Authorization: `Bearer ${token}`,
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+  });
 };
 
 function checkStatus(response) {
@@ -30,34 +38,52 @@ export function getPublicRepositories() {
   }).then(checkStatus).then(parseJSON);
 }
 export function getUserRepositories() {
-  const token = localStorage.getItem('id_token');
-  const headers = Object.assign({}, fetchHeaders, {
-    Authorization: `Bearer ${token}`,
-  });
   return fetch('/api/user/repos', {
     method: 'GET',
-    headers,
+    headers: getWebtaskHeaders(),
   }).then(checkStatus).then(parseJSON);
 }
 
 export function getLatestReleaseRepository(owner, repo) {
-  const token = localStorage.getItem('id_token');
-  const headers = Object.assign({}, fetchHeaders, {
-    Authorization: `Bearer ${token}`,
-  });
   return fetch(`/api/repos/${owner}/${repo}/releases/latest`, {
     method: 'GET',
-    headers,
+    headers: getWebtaskHeaders(),
   }).then(checkStatus).then(parseJSON);
 }
 
-export function addHookToRepository(owner, repo) {
-  const token = localStorage.getItem('id_token');
-  const headers = Object.assign({}, fetchHeaders, {
-    Authorization: `Bearer ${token}`,
-  });
+export function addHookToRepository(id, owner, repo) {
   return fetch(`/api/repos/${owner}/${repo}/hooks`, {
     method: 'POST',
-    headers,
+    body: JSON.stringify({ id }),
+    headers: getWebtaskHeaders(),
+  }).then(checkStatus).then(parseJSON);
+}
+
+export function getHook(owner, repo) {
+  return fetch(`/api/repos/${owner}/${repo}/hook`, {
+    method: 'GET',
+    headers: getWebtaskHeaders(),
+  }).then(checkStatus).then(parseJSON);
+}
+
+export function subscribe(repoId) {
+  return fetch(`/api/subscribe/${repoId}`, {
+    method: 'POST',
+    headers: getWebtaskHeaders(),
+  }).then(checkStatus).then(parseJSON);
+}
+
+export function createSuggestionIssue(id, owner, repo) {
+  return fetch(`/api/repos/${owner}/${repo}/issues/`, {
+    method: 'POST',
+    body: JSON.stringify({ id }),
+    headers: getWebtaskHeaders(),
+  }).then(checkStatus).then(parseJSON);
+}
+
+export function fetchRepositoriesSubscribed() {
+  return fetch('/api/subscribe', {
+    method: 'GET',
+    headers: getWebtaskHeaders(),
   }).then(checkStatus).then(parseJSON);
 }

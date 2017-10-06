@@ -1,5 +1,5 @@
 import auth0 from 'auth0-js';
-import store from './store';
+import { uiStore } from 'store';
 import history from './history';
 
 const CLIENTID = process.env.CLIENTID;
@@ -19,14 +19,14 @@ export class Auth {
   });
 
   login() {
-    store.isAuthenticating = true;
+    uiStore.isAuthenticating = true;
     this.webAuth0.authorize({
       connection: 'github',
     });
   }
 
   logout() {
-    store.clearCurrentUser();
+    uiStore.clearCurrentUser();
     this.login();
   }
 
@@ -47,7 +47,7 @@ export class Auth {
         console.log(error);
         return;
       }
-      store.setLogin({
+      uiStore.setLogin({
         accessToken: authResult.accessToken,
         idToken: authResult.idToken,
         expiresAt: (authResult.expiresIn * 1000) + new Date().getTime(),

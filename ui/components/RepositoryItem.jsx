@@ -4,7 +4,7 @@ import React, { PureComponent } from 'react';
 import { autobind } from 'core-decorators';
 import PropTypes from 'prop-types';
 import moment from 'moment';
-import { getLatestReleaseRepository, addHookToRepository } from 'api';
+import { getLatestReleaseRepository } from 'api';
 import Markdown from './Markdown';
 
 const setVersionInfo = version => state => ({ ...state, version });
@@ -39,16 +39,6 @@ export default class extends PureComponent {
         if (!releaseLoaded) {
           self.loadRelease();
         }
-      },
-    });
-
-    this.$notificationCheck.checkbox({
-      onChecked() {
-        const { repository } = self.props;
-        const { name, owner } = repository;
-        addHookToRepository(owner.login, name);
-      },
-      onUnchecked() {
       },
     });
   }
@@ -91,12 +81,6 @@ export default class extends PureComponent {
             <a href={repository.html_url} target="_blank">{repository.name}</a>
             <span className="date">
               {moment(repository.pushed_at).fromNow()}
-            </span>
-            <span className="date">
-              <div className="ui slider checkbox" ref={(el) => { this.$notificationCheck = $(el); }}>
-                <input type="checkbox" name={`enableNotification${repository.id}`} id={`enableNotification${repository.id}`} />
-                <label htmlFor={`enableNotification${repository.id}`}>Notification</label>
-              </div>
             </span>
           </div>
           <div className="extra text">

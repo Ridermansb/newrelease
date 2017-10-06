@@ -1,8 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { autobind } from 'core-decorators';
+import { addHookToRepository, getHook, subscribe, createSuggestionIssue } from 'api';
+import { uiStore, domainStore } from 'store';
 import auth from '../auth';
 import logo from '../../favicon.png';
-import store from '../store';
+import SearchRepository from './SearchRepository';
+
 
 export default class extends React.PureComponent {
   static displaName = 'Menu';
@@ -15,33 +19,92 @@ export default class extends React.PureComponent {
     className: '',
   };
 
-  /*  componentDidMount() {
-    this.$dropDownUser
-      .dropdown();
-  } */
+  componentDidMount() {
+    // this.$dropDownUser.dropdown();
+  }
 
   // eslint-disable-next-line class-methods-use-this
   logoutClick() {
     auth.logout();
   }
 
+  @autobind
+  // eslint-disable-next-line class-methods-use-this
+  async repositorySelected(repository) {
+    const { currentUser } = uiStore;
+    const { name, login, id } = repository;
+
+    try {
+      uiStore.isAddingRepository = true;
+      await getHook(login, name);
+      subscribe(id);
+      if (!domainStore.repositories.has(id)) {
+        domainStore.repositories.set(id, repository);
+      }
+    } catch (e) {
+      if (e.response.status === 404) {
+        const repositoryIsMine = currentUser.nickname === repository.login;
+        if (repositoryIsMine) {
+          addHookToRepository(id, login, name);
+          this.$askSubscription
+            .modal({
+              closable: false,
+              onDeny() { return false; },
+              onApprove() { subscribe(id); },
+            }).modal('show');
+        } else {
+          this.askToSuggestIntegration(repository);
+        }
+      }
+    } finally {
+      uiStore.isAddingRepository = false;
+    }
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  askToSuggestIntegration(repository) {
+    const { name, login, id } = repository;
+    this.$suggestIntegration
+      .modal({
+        closable: false,
+        onDeny() { return false; },
+        onApprove() { createSuggestionIssue(id, login, name); },
+      }).modal('show');
+  }
+
   render() {
     const { className } = this.props;
-    const { currentUser } = store;
+    const { currentUser } = uiStore;
 
     return (<div className={`ui borderless ${className} attached stackable menu`}>
+
+      <div className="ui modal" ref={(el) => { this.$askSubscription = $(el); }}>
+        <div className="header">Repository add successfully</div>
+        <div className="content">
+          You want to subscribe on any new release?
+        </div>
+        <div className="actions">
+          <div className="ui deny button">No</div>
+          <div className="ui positive button">Yes</div>
+        </div>
+      </div>
+      <div className="ui modal" ref={(el) => { this.$suggestIntegration = $(el); }}>
+        <div className="header">Repository not ready</div>
+        <div className="content">
+          The owner of this repository does not configure yet, do you want to suggest him?
+        </div>
+        <div className="actions">
+          <div className="ui deny button">Not now</div>
+          <div className="ui positive button">Yes, send suggestion</div>
+        </div>
+      </div>
+
       <div className="ui container">
         <a href="/" className="header item">
           <img src={logo} alt="Logo" className="ui avatar image" /> New Release
         </a>
         <div className="item">
-          <div className="ui category small search">
-            <div className="ui left icon input">
-              <i className="github icon" />
-              <input className="prompt" type="text" placeholder="Search repository..." />
-            </div>
-            <div className="results" />
-          </div>
+          <SearchRepository onRepositorySelected={this.repositorySelected} />
         </div>
         <div className="right menu">
           <div className="item">

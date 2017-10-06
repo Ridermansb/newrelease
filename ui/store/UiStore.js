@@ -1,16 +1,23 @@
 import { observable, action, computed } from 'mobx';
 
-class MainStore {
-  @observable isAuthenticating = false;
+export default class UiStore {
+  @observable isAddingRepository = false;
+
   @observable currentUser = false;
   @observable expiresAt = new Date().getTime();
+  @observable isAuthenticating = false;
 
-  constructor() {
+  constructor(rootStore) {
+    this.rootStore = rootStore;
     this.expiresAt = localStorage.getItem('expires_at') || new Date().getTime();
     const storedProfile = localStorage.getItem('profile');
     this.currentUser = storedProfile
       ? JSON.parse(storedProfile)
       : false;
+  }
+
+  @computed get isAuthenticated() {
+    return this.currentUser && new Date().getTime() < this.expiresAt;
   }
 
   @action clearCurrentUser() {
@@ -31,11 +38,4 @@ class MainStore {
     this.expiresAt = expiresAt;
     this.isAuthenticating = false;
   }
-
-  @computed get isAuthenticated() {
-    return this.currentUser && new Date().getTime() < this.expiresAt;
-  }
 }
-
-const singleton = new MainStore();
-export default singleton;
