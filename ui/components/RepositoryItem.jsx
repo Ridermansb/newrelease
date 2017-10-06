@@ -4,11 +4,13 @@ import React, { PureComponent } from 'react';
 import { autobind } from 'core-decorators';
 import PropTypes from 'prop-types';
 import moment from 'moment';
-import { getLatestReleaseRepository } from 'api';
+import { domainStore } from 'store';
+import { getLatestReleaseRepository, unsubscribe } from 'api';
 import Markdown from './Markdown';
 
 const setVersionInfo = version => state => ({ ...state, version });
 const setIsLoadingRelease = isLoadingRelease => state => ({ ...state, isLoadingRelease });
+const setIsRemoving = isRemoving => state => ({ ...state, isRemoving });
 const setReleaseLoaded = releaseLoaded => state => ({ ...state, releaseLoaded });
 
 export default class extends PureComponent {
@@ -16,18 +18,21 @@ export default class extends PureComponent {
     repository: PropTypes.shape({
       name: PropTypes.string.isRequired,
       full_name: PropTypes.string.isRequired,
-      login: PropTypes.string,
+      owner: PropTypes.shape({
+        login: PropTypes.string,
+      }),
       avatar_url: PropTypes.string,
     }).isRequired,
   };
 
   static defaultProps = {
-    login: 'unknown',
+    owner: undefined,
     avatar_url: '',
   };
 
   state = {
     releaseLoaded: false,
+    isRemoving: false,
     isLoadingRelease: false,
   };
 
@@ -44,24 +49,38 @@ export default class extends PureComponent {
   }
 
   @autobind
-  loadRelease() {
+  async loadRelease() {
     const { repository } = this.props;
     const { name, owner } = repository;
 
-    this.setState(setIsLoadingRelease(true));
-    getLatestReleaseRepository(owner.login, name)
-      .then((version) => {
-        this.setState(setVersionInfo(version));
-      })
-      .finally(() => {
-        this.setState(setIsLoadingRelease(false));
-        this.setState(setReleaseLoaded(true));
-      });
+    try {
+      this.setState(setIsLoadingRelease(true));
+      const version = await getLatestReleaseRepository(owner.login, name);
+      this.setState(setVersionInfo(version));
+    } finally {
+      this.setState(setIsLoadingRelease(false));
+      this.setState(setReleaseLoaded(true));
+    }
+  }
+
+  @autobind
+  async removeRepository() {
+    const { repository } = this.props;
+    try {
+      this.setState(setIsRemoving(true));
+      await unsubscribe(repository.id);
+      const repositories = domainStore.repositories.filter(r => r.id !== repository.id);
+      this.setState(setIsRemoving(false));
+      domainStore.repositories.replace(repositories);
+    } catch (e) {
+      this.setState(setIsRemoving(false));
+      throw e;
+    }
   }
 
   render() {
     const { repository } = this.props;
-    const { version, isLoadingRelease } = this.state;
+    const { version, isLoadingRelease, isRemoving } = this.state;
 
     const versionInfo = version ? (<span className="date">
       <i className="tag icon" /> {version.name} at {moment(version.published_at).fromNow()}
@@ -69,6 +88,10 @@ export default class extends PureComponent {
     const versionDescription = version
       ? (<Markdown text={version.body} />)
       : null;
+
+    const close = isRemoving
+      ? <div className="ui active inline mini loader" />
+      : <i role="presentation" className="close link icon" onClick={this.removeRepository} />;
 
     return (
       <div href={`#${repository.full_name}`} className="event">
@@ -79,9 +102,8 @@ export default class extends PureComponent {
           <div className="summary">
             <a href={repository.owner.html_url} target="_blank">{repository.owner.login}</a> &nbsp;/&nbsp;
             <a href={repository.html_url} target="_blank">{repository.name}</a>
-            <span className="date">
-              {moment(repository.pushed_at).fromNow()}
-            </span>
+            <span className="date">{moment(repository.pushed_at).fromNow()}</span>
+            <span className="date">{close}</span>
           </div>
           <div className="extra text">
             {repository.description}

@@ -122,32 +122,37 @@ app.use(authUser);
 
 // region Helpers functions
 
-function requestFromGithubAPI(method, req, res, route, body, cb) {
-  // eslint-disable-next-line no-param-reassign
-  cb = cb || body;
+function requestFromGithubAPI(method, req, res, route, body) {
   const json = method !== 'GET' ? body : true;
-
   const routes = route.trim().split('?');
   const params = routes.length > 1 ? `&${routes[1]}` : '';
   const url = `${GITHUB_URL}/${routes[0]}?client_id=${req.webtaskContext.secrets.gh_client_id}&client_secret=${req.webtaskContext.secrets.gh_client_secret}${params}`;
-  request({
-    url,
-    method,
-    json,
-    headers: {
-      Authorization: `token ${res.locals.githubIdp.access_token}`,
-      Accept: 'application/vnd.github.mercy-preview+json',
-      'Content-Type': 'application/json',
-      'User-Agent': req.headers['user-agent'],
-    },
-  }, (error, response, jsonResp) => {
-    if (error) throw new Error(error);
-    if (jsonResp.message === 'Not Found') {
-      return res.boom.notFound();
-    } else if (jsonResp.documentation_url) {
-      return res.boom.badRequest("Validation didn't suceed", jsonResp);
-    }
-    return cb(response, jsonResp);
+
+  return new Promise((resolve, reject) => {
+    request({ url,
+      method,
+      json,
+      headers: {
+        Authorization: `token ${res.locals.githubIdp.access_token}`,
+        Accept: 'application/vnd.github.mercy-preview+json',
+        'Content-Type': 'application/json',
+        'User-Agent': req.headers['user-agent'],
+      },
+    }, (error, response, jsonResp) => {
+      if (error) {
+        res.boom.badRequest('Ops, are you there GitHub?', error);
+        return reject(error);
+      }
+      if (jsonResp.message === 'Not Found') {
+        res.boom.notFound();
+        return reject(jsonResp);
+      } else if (jsonResp.documentation_url) {
+        res.boom.badRequest("Validation didn't suceed", jsonResp);
+        return reject(jsonResp);
+      }
+
+      return resolve(jsonResp);
+    });
   });
 }
 
@@ -188,13 +193,13 @@ function ensureData(storage, propName, id, defaultData, cb) {
 // region Github API Proxy
 
 app.get('/user/repos', cache(120), (req, res) => {
-  requestFromGithubAPI('GET', req, res, 'user/repos?affiliation=owner,organization_member&sort=updated',
-    (response, body) => res.json(body));
+  requestFromGithubAPI('GET', req, res, 'user/repos?affiliation=owner,organization_member&sort=updated')
+    .then(resp => res.json(resp));
 });
 
 app.get('/repos/:owner/:repo/releases/latest', cache(120), (req, res) => {
-  requestFromGithubAPI('GET', req, res, `repos/${req.params.owner}/${req.params.repo}/releases/latest`,
-    (response, body) => res.json(body));
+  requestFromGithubAPI('GET', req, res, `repos/${req.params.owner}/${req.params.repo}/releases/latest`)
+    .then(resp => res.json(resp));
 });
 
 /**
@@ -205,7 +210,7 @@ app.post('/repos/:owner/:repo/hooks', (req, res) => {
   const { storage, secrets } = req.webtaskContext;
   const { id } = req.body;
 
-  function saveHookAndRepo(response, body) {
+  function saveHookAndRepo(body) {
     try {
       ensureData(storage, 'repos', id, { hook: false }, (repositoryData, allData) => {
         Object.assign(repositoryData, { hook: body.id, owner, repo });
@@ -226,7 +231,7 @@ app.post('/repos/:owner/:repo/hooks', (req, res) => {
       content_type: 'json',
       secret: secrets.gh_hook_secret,
     },
-  }, saveHookAndRepo);
+  }).then(saveHookAndRepo);
 });
 
 app.get('/search/repositories', cache(120), (req, res) => {
@@ -234,22 +239,23 @@ app.get('/search/repositories', cache(120), (req, res) => {
     .keys(req.query)
     .map(key => `${key}=${req.query[key]}`);
 
-  requestFromGithubAPI('GET', req, res, `search/repositories?${query.join('&')}`,
-    (response, body) => res.json(body));
+  requestFromGithubAPI('GET', req, res, `search/repositories?${query.join('&')}`)
+    .then(resp => res.json(resp));
 });
 
 app.get('/repos/:owner/:repo/hook', cache(120), (req, res) => {
   const { owner, repo } = req.params;
   const { secrets } = req.webtaskContext;
 
-  requestFromGithubAPI('GET', req, res, `repos/${owner}/${repo}/hooks`, (response, body) => {
-    const hook = body.find(h => h.name === 'web' && h.config && h.config.url.startsWith(secrets.hook_url));
-    if (hook) {
-      res.json(hook);
-    } else {
-      res.boom.notFound();
-    }
-  });
+  requestFromGithubAPI('GET', req, res, `repos/${owner}/${repo}/hooks`)
+    .then((body) => {
+      const hook = body.find(h => h.name === 'web' && h.config && h.config.url.startsWith(secrets.hook_url));
+      if (hook) {
+        res.json(hook);
+      } else {
+        res.boom.notFound();
+      }
+    });
 });
 
 // endregion
@@ -262,7 +268,7 @@ app.post('/repos/:owner/:repo/issues', (req, res) => {
   const { storage } = req.webtaskContext;
   const { user_id } = res.locals.user;
 
-  function saveSuggestion(response, body) {
+  function saveSuggestion(body) {
     try {
       ensureData(storage, 'suggestions', id, { users: [], issues: [] }, (repoSuggestions, allData) => {
         repoSuggestions.users.push(user_id);
@@ -288,7 +294,7 @@ It is very simple,
 3. Search your repository on searchbox  and select it
       
 Done :)`,
-  }, saveSuggestion);
+  }).then(saveSuggestion);
 });
 
 app.post('/subscribe/:repoId(\\d+)', (req, res) => {
@@ -301,14 +307,14 @@ app.post('/subscribe/:repoId(\\d+)', (req, res) => {
       if (errorSet) {
         return res.boom.badImplementation(errorSet);
       }
-      return res.sendStatus(201);
+      return res.status(201).json({ ok: true });
     });
   }
 
   try {
     ensureData(storage, 'users', user_id, { subscriptions: [] }, (userData, allData) => {
       if (userData.subscriptions.find(s => s === parseInt(repoId, 10))) {
-        return res.sendStatus(201);
+        return res.status(201).json({ ok: true });
       }
       userData.subscriptions.push(parseInt(repoId, 10));
       return saveData(allData);
@@ -319,13 +325,49 @@ app.post('/subscribe/:repoId(\\d+)', (req, res) => {
   }
 });
 
-app.get('/subscribe', (req, res) => {
+app.get('/subscribed', (req, res) => {
   const { storage } = req.webtaskContext;
   const { user_id } = res.locals.user;
 
   try {
-    ensureData(storage, 'users', user_id, { subscriptions: [] }, (userData) => {
-      res.json(userData.subscriptions);
+    ensureData(storage, 'users', user_id, { subscriptions: [] }, (userData, allData) => {
+      const fetchAllRepos = userData.subscriptions.reduce((acc, s) => {
+        const repo = allData.repos.find(r => r.id === s);
+        if (repo) {
+          acc.push(requestFromGithubAPI('GET', req, res, `repos/${repo.owner}/${repo.repo}`)
+            .then(r => ({ newrelease: { hook: !!repo.hook }, ...r })));
+        }
+        // TODO if is in subscribed and not in repo, sometimg is wrong.. add into warnign list
+        return acc;
+      }, []);
+      Promise.all(fetchAllRepos)
+        .then(resp => res.json(resp))
+        .catch(e => res.boom.badImplementation(e));
+    });
+  } catch (e) {
+    console.error('Ops', e);
+    res.boom.badImplementation(e);
+  }
+});
+
+app.delete('/subscribe/:repoId(\\d+)', (req, res) => {
+  const { storage } = req.webtaskContext;
+  const { repoId } = req.params;
+  const { user_id } = res.locals.user;
+
+  function saveData(dataToSave) {
+    storage.set(dataToSave, (errorSet) => {
+      if (errorSet) {
+        return res.boom.badImplementation(errorSet);
+      }
+      return res.status(200).json({ ok: true });
+    });
+  }
+
+  try {
+    ensureData(storage, 'users', user_id, { subscriptions: [] }, (userData, allData) => {
+      userData.subscriptions = userData.subscriptions.filter(s => s !== parseInt(repoId, 10));
+      return saveData(allData);
     });
   } catch (e) {
     console.error('Ops', e);

@@ -33,12 +33,8 @@ export default class extends PureComponent {
           const assosImage = R.assoc('image');
           const setImage = R.converge(assosImage, [ownerAvatar, R.identity]);
 
-          const ownerLogin = R.path(['owner', 'login']);
-          const assosLogin = R.assoc('login');
-          const setLogin = R.converge(assosLogin, [ownerLogin, R.identity]);
-
-          const mapObject = R.pipe(setImage, setLogin, R.pickAll([
-            'id', 'login', 'name', 'full_name', 'image', 'description',
+          const mapObject = R.pipe(setImage, R.pickAll([
+            'id', 'owner', 'name', 'topics', 'language', 'full_name', 'image', 'description',
           ]));
 
           /*

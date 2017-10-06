@@ -32,25 +32,28 @@ export default class extends React.PureComponent {
   // eslint-disable-next-line class-methods-use-this
   async repositorySelected(repository) {
     const { currentUser } = uiStore;
-    const { name, login, id } = repository;
+    const { name, owner, id } = repository;
 
     try {
       uiStore.isAddingRepository = true;
-      await getHook(login, name);
-      subscribe(id);
-      if (!domainStore.repositories.has(id)) {
-        domainStore.repositories.set(id, repository);
+      await getHook(owner.login, name);
+      if (!domainStore.repositories.find(r => r.id === id)) {
+        domainStore.repositories.push(repository);
       }
+      subscribe(id);
     } catch (e) {
       if (e.response.status === 404) {
-        const repositoryIsMine = currentUser.nickname === repository.login;
+        const repositoryIsMine = currentUser.nickname === repository.owner.login;
         if (repositoryIsMine) {
-          addHookToRepository(id, login, name);
+          addHookToRepository(id, owner.login, name);
           this.$askSubscription
             .modal({
               closable: false,
               onDeny() { return false; },
-              onApprove() { subscribe(id); },
+              onApprove() {
+                domainStore.repositories.push(repository);
+                subscribe(id);
+              },
             }).modal('show');
         } else {
           this.askToSuggestIntegration(repository);
@@ -63,12 +66,12 @@ export default class extends React.PureComponent {
 
   // eslint-disable-next-line class-methods-use-this
   askToSuggestIntegration(repository) {
-    const { name, login, id } = repository;
+    const { name, owner, id } = repository;
     this.$suggestIntegration
       .modal({
         closable: false,
         onDeny() { return false; },
-        onApprove() { createSuggestionIssue(id, login, name); },
+        onApprove() { createSuggestionIssue(id, owner.login, name); },
       }).modal('show');
   }
 

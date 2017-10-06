@@ -73,6 +73,13 @@ export function subscribe(repoId) {
   }).then(checkStatus).then(parseJSON);
 }
 
+export function unsubscribe(repoId) {
+  return fetch(`/api/subscribe/${repoId}`, {
+    method: 'DELETE',
+    headers: getWebtaskHeaders(),
+  }).then(checkStatus).then(parseJSON);
+}
+
 export function createSuggestionIssue(id, owner, repo) {
   return fetch(`/api/repos/${owner}/${repo}/issues/`, {
     method: 'POST',
@@ -82,7 +89,7 @@ export function createSuggestionIssue(id, owner, repo) {
 }
 
 export function fetchRepositoriesSubscribed() {
-  return fetch('/api/subscribe', {
+  return fetch('/api/subscribed', {
     method: 'GET',
     headers: getWebtaskHeaders(),
   }).then(checkStatus).then(parseJSON);

@@ -2,7 +2,7 @@ import { observable, action } from 'mobx';
 import { fetchRepositoriesSubscribed } from 'api';
 
 export default class DomainStore {
-  @observable repositories = new Map();
+  @observable repositories = [];
 
   constructor(rootStore) {
     this.rootStore = rootStore;
