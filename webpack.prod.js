@@ -15,7 +15,7 @@ module.exports = merge(common, {
     path: resolve('dist'),
     filename: '[name].[chunkhash].js',
     chunkFilename: '[name].[chunkhash].chunk.js',
-    publicPath: '/',
+    publicPath: '/', // publicPath: PUBLIC_PATH
   },
   module: {
     rules: [{

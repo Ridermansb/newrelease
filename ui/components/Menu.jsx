@@ -20,7 +20,7 @@ export default class extends React.PureComponent {
   };
 
   componentDidMount() {
-    // this.$dropDownUser.dropdown();
+    this.$dropDownUser.dropdown();
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -115,26 +115,18 @@ export default class extends React.PureComponent {
           <SearchRepository onRepositorySelected={this.repositorySelected} />
         </div>
         <div className="right menu">
-          <div className="item">
-            <img className="ui avatar image" src={currentUser.picture} alt="User avatar" />
-          </div>
-          <button className="ui button item" onClick={this.logoutClick} >
-            <i className="icon sign out" />
-          </button>
-          {/*
           <div
             className="ui item inline dropdown"
+            ref={((el) => { this.$dropDownUser = $(el); })}
           >
-            <i className="ui avatar user icon" />
+            <img className="ui avatar image" src={currentUser.picture} alt="User avatar" />
             <i className="dropdown icon" />
             <div className="menu">
-              <button className="item" ref={((el) => { this.$dropDownUser = el; })}
-               onClick={this.logoutClick}>
-                Logout
+              <button className="item" onClick={this.logoutClick} >
+                <i className="icon sign out" /> Logout
               </button>
             </div>
           </div>
-          */}
         </div>
       </div>
     </div>);

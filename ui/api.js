@@ -94,3 +94,18 @@ export function fetchRepositoriesSubscribed() {
     headers: getWebtaskHeaders(),
   }).then(checkStatus).then(parseJSON);
 }
+
+export function subscribeToPushNotification(subscription) {
+  return fetch('/api/push/subscribe', {
+    method: 'POST',
+    body: JSON.stringify(subscription),
+    headers: getWebtaskHeaders(),
+  }).then(checkStatus).then(parseJSON);
+}
+
+export function unsubscribeToPushNotification() {
+  return fetch('/api/push/subscribe', {
+    method: 'DELETE',
+    headers: getWebtaskHeaders(),
+  }).then(checkStatus).then(parseJSON);
+}

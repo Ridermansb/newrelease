@@ -9,14 +9,20 @@
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const FaviconsWebpackPlugin = require('favicons-webpack-plugin');
-
+const WebpackPwaManifest = require('webpack-pwa-manifest');
+const SWPrecacheWebpackPlugin = require('sw-precache-webpack-plugin');
+const GitRevisionPlugin = require('git-revision-webpack-plugin');
 const { resolve } = require('path');
 
 require('dotenv').config();
 
+const PUBLIC_PATH = process.env.PUBLIC_PATH || 'https://www.my-domain.com/';
+const gitRevisionPlugin = new GitRevisionPlugin();
+
 module.exports = {
   entry: {
     vendor: ['react', 'react-dom', 'jquery', 'semantic-ui-css'],
+    sw: './ui/sw.js',
   },
   plugins: [
     new webpack.EnvironmentPlugin({
@@ -24,11 +30,55 @@ module.exports = {
       GITHUB_API_URI: 'https://api.github.com',
       DOMAIN: '',
       CLIENTID: '',
+      VAPID_PUBLIC: 'BCeOKPz2URgJ8Fak0qnc8AHTIOsClIppC_Eup432IZTAx3SEhgYJa-P-bch8dOdCPfMgnIZeKYXzASvaYqbM0RE',
     }),
     new webpack.ProvidePlugin({
       // From http://madole.xyz/using-webpack-to-set-up-polyfills-in-your-site/
       Promise: 'imports-loader?this=>global!exports-loader?global.Promise!es6-promise',
       fetch: 'imports-loader?this=>global!exports-loader?global.fetch!whatwg-fetch',
+    }),
+    new WebpackPwaManifest({
+      name: 'New Release',
+      short_name: 'New Release',
+      start_url: '.',
+      display: 'standalone',
+      related_applications: [{
+        platform: 'web',
+        id: 'web',
+        // url: PUBLIC_PATH,
+      }],
+      description: 'Be notified for new repository releases',
+      background_color: '#0296d3',
+      theme_color: '#0296d3',
+      lang: 'pt-BR',
+      icons: [{
+        src: resolve('./favicon-large.png'),
+        sizes: [120, 152, 144, 167, 180, 1024],
+        destination: resolve('icons', 'ios'),
+        ios: true,
+      }, {
+        src: resolve('./favicon-large.png'),
+        size: 1024,
+        destination: resolve('icons', 'ios'),
+        ios: 'startup',
+      }, {
+        src: resolve('./favicon-large.png'),
+        sizes: [36, 48, 72, 96, 144, 192, 512],
+        destination: resolve('icons', 'android'),
+      }],
+      prefer_related_applications: false,
+      ios: {
+        'apple-mobile-web-app-title': 'New Release',
+        'apple-mobile-web-app-status-bar-style': '#434345',
+      },
+    }),
+    new SWPrecacheWebpackPlugin({
+      cacheId: gitRevisionPlugin.commithash(), // 'my-domain-cache-id',
+      dontCacheBustUrlsMatching: /\.\w{8}\./,
+      filename: 'sw.js',
+      minify: true,
+      navigateFallback: `${PUBLIC_PATH}index.html`,
+      staticFileGlobsIgnorePatterns: [/\.map$/, /manifest\.json$/, /dist\/.*\.html/],
     }),
     new HtmlWebpackPlugin({
       title: 'New Release',
@@ -37,7 +87,7 @@ module.exports = {
       minify: { collapseWhitespace: true },
     }),
     new FaviconsWebpackPlugin({
-      logo: resolve(__dirname, 'favicon-black.png'),
+      logo: resolve(__dirname, 'favicon.png'),
       persistentCache: true,
       icons: {
         android: false,

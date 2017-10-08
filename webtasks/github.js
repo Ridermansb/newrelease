@@ -28,8 +28,15 @@ const jwksRsa = require('jwks-rsa');
 const jwt = require('express-jwt');
 const boom = require('express-boom');
 const mcache = require('memory-cache');
+const webPush = require('web-push');
 
 const app = express();
+
+webPush.setVapidDetails(
+  'mailto:ridermansb@gmail.com',
+  process.env.VAPID_PUBLIC,
+  process.env.VAPID_PRIVATE,
+);
 
 const GITHUB_URL = 'https://api.github.com';
 const defaultStorage = { users: [], repos: [], suggestions: [] };
@@ -378,6 +385,74 @@ app.delete('/subscribe/:repoId(\\d+)', (req, res) => {
 app.post('/newrelease', (req, res) => {
   console.log(req);
   res.json({ isOk: true });
+});
+
+app.post('/push/subscribe', (req, res) => {
+  const { storage } = req.webtaskContext;
+  const { user_id } = res.locals.user;
+
+  const subscription = {
+    endpoint: req.body.endpoint,
+    keys: {
+      p256dh: req.body.keys.p256dh,
+      auth: req.body.keys.auth,
+    },
+  };
+
+  function saveData(dataToSave) {
+    storage.set(dataToSave, (errorSet) => {
+      if (errorSet) {
+        return res.boom.badImplementation(errorSet);
+      }
+
+      // Send thanks
+      const payload = JSON.stringify({
+        title: 'Welcome',
+        body: 'Thank you for enabling push notifications',
+      });
+      const options = { TTL: 3600 /* 1sec * 60 * 60 = 1h */ };
+      webPush.sendNotification(subscription, payload, options)
+        .then(() => { res.status(200).json({ ok: true }); })
+        .catch(err => res.boom.badImplementation('Unable to send welcome push notification', err));
+
+      // Return request
+      return res.status(200).json({ ok: true });
+    });
+  }
+
+  try {
+    ensureData(storage, 'users', user_id, { subscriptions: [] }, (userData, allData) => {
+      userData.subscriptionKeys = subscription;
+      return saveData(allData);
+    });
+  } catch (e) {
+    console.error('Ops', e);
+    res.boom.badImplementation(e);
+  }
+});
+
+app.delete('/push/subscribe', (req, res) => {
+  const { storage } = req.webtaskContext;
+  const { user_id } = res.locals.user;
+
+  function saveData(dataToSave) {
+    storage.set(dataToSave, (errorSet) => {
+      if (errorSet) {
+        return res.boom.badImplementation(errorSet);
+      }
+      return res.status(200).json({ ok: true });
+    });
+  }
+
+  try {
+    ensureData(storage, 'users', user_id, { subscriptions: [] }, (userData, allData) => {
+      delete userData.subscriptionKeys;
+      return saveData(allData);
+    });
+  } catch (e) {
+    console.error('Ops', e);
+    res.boom.badImplementation(e);
+  }
 });
 
 // endregion

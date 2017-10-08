@@ -2,6 +2,7 @@
 const webpack = require('webpack');
 const WebpackDevServer = require('webpack-dev-server');
 const { join, resolve } = require('path');
+const fs = require('fs');
 const debug = require('debug')('webpack');
 const webpackConfig = require('./webpack.dev.js');
 
@@ -14,14 +15,16 @@ const host = 'localhost';
 const port = 3000;
 const apiPort = process.env.API_PORT || 3001;
 
-debug('Starting webpack development server ... ');
-
 const srcFolder = resolve(__dirname, 'src');
+const certFolder = resolve(__dirname, '../ssl');
+
+debug('Starting webpack development server ... ', join(certFolder, 'server.crt'));
+debug('SSL certificates on ', certFolder);
 
 const devServer = new WebpackDevServer(compiler, {
   contentBase: join(srcFolder, 'assets'),
   publicPath: webpackConfig.output.publicPath,
-  inline: false,
+  inline: true,
   overlay: true,
   compress: true,
   clientLogLevel: 'error',
@@ -30,14 +33,27 @@ const devServer = new WebpackDevServer(compiler, {
   hot: true,
   historyApiFallback: true,
   noInfo: true,
+  /*
+  https: {
+    cert: fs.readFileSync(join(certFolder, 'cert.pem')),
+    key: fs.readFileSync(join(certFolder, 'key.pem')),
+  },
+  */
   proxy: {
-    // '/api/**': `http://[::1]:${apiPort}`,
     '/api/**': {
-      target: `http://localhost:${apiPort}`,
+      target: `http://localhost:${apiPort}`, // `http://[::1]:${apiPort}`
       pathRewrite: { '^/api': '' },
     },
   },
   stats: 'errors-only',
+  setup(app) {
+    debug('Setup server..');
+    app.get('/sw.js', (req, res) => {
+      debug('SW request..');
+      res.set({ 'Content-Type': 'application/javascript; charset=utf-8' });
+      res.send(fs.readFileSync('./ui/sw.js'));
+    });
+  },
 });
 
 devServer.listen(port, host, (err) => {
