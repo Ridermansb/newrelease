@@ -6,7 +6,6 @@ import { uiStore } from 'store';
 import HomePage from './pages/HomePage';
 import CallbackPage from './pages/CallbackPage';
 import auth from './auth';
-import '../node_modules/noty/lib/noty.css';
 
 const handleAuthentication = (nextState) => {
   if (/access_token|id_token|error/.test(nextState.location.hash)) {

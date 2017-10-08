@@ -46,15 +46,7 @@ export default class extends React.PureComponent {
         const repositoryIsMine = currentUser.nickname === repository.owner.login;
         if (repositoryIsMine) {
           addHookToRepository(id, owner.login, name);
-          this.$askSubscription
-            .modal({
-              closable: false,
-              onDeny() { return false; },
-              onApprove() {
-                domainStore.repositories.push(repository);
-                subscribe(id);
-              },
-            }).modal('show');
+          this.askToSubscribe(repository);
         } else {
           this.askToSuggestIntegration(repository);
         }
@@ -64,7 +56,20 @@ export default class extends React.PureComponent {
     }
   }
 
-  // eslint-disable-next-line class-methods-use-this
+  @autobind
+  askToSubscribe(repository) {
+    this.$askSubscription
+      .modal({
+        closable: false,
+        onDeny() { return false; },
+        onApprove() {
+          domainStore.repositories.push(repository);
+          subscribe(repository.id);
+        },
+      }).modal('show');
+  }
+
+  @autobind
   askToSuggestIntegration(repository) {
     const { name, owner, id } = repository;
     this.$suggestIntegration
