@@ -117,6 +117,21 @@ function authUser(req, res, next) {
   });
 }
 
+/**
+ * Check if hook has a valid secret
+ * @param req
+ * @param res
+ * @param next
+ * @returns {*}
+ */
+function validateSecret(req, res, next) {
+  const { secrets } = req.webtaskContext;
+  if (req.body.hook.config.secret === secrets.gh_hook_secret) {
+    return next();
+  }
+  return res.boom.unauthorized('Invalid token');
+}
+
 app.use(boom());
 app.use(requireAuth);
 app.use(bodyParser.json());
@@ -383,7 +398,34 @@ app.delete('/subscribe/:repoId(\\d+)', (req, res) => {
 });
 
 app.post('/newrelease', (req, res) => {
-  console.log(req);
+  const { storage } = req.webtaskContext;
+
+  const { repository } = req.body;
+
+  storage.get((error, data) => {
+    if (error) {
+      throw error;
+    }
+
+    const payload = JSON.stringify({
+      title: `New version of ${repository.full_name} available`,
+      body: repository.description,
+      icon: repository.owner.avatar_url,
+      // url: repository.html_url
+    });
+    const options = { TTL: 3600 /* 1sec * 60 * 60 = 1h */ };
+    const usersSubscribed = data.users.filter(u => u.subscriptions.includes(repository.id));
+    console.log('Launching push ', usersSubscribed);
+    const pushingPromises = usersSubscribed
+      .map(user => webPush.sendNotification(user.subscriptionKeys, payload, options));
+    Promise.all(pushingPromises)
+      .then(resp => res.json(resp))
+      .catch(e => res.boom.badImplementation(e));
+  });
+
+  // TODO find all users that subscribe for this repository
+  // Fire push notification for everyone
+
   res.json({ isOk: true });
 });
 

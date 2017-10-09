@@ -11,7 +11,7 @@
    
 > *Create/update proxy to Github*    
    
-    wt create webtasks/github.js -p "newrelease" --secrets-file .env.auth0 --name github -d express-boom -d auth0 -d memory-cache -d web-push
+    wt create dist/github.js -p "newrelease" --secrets-file .env.auth0 --name github -d es6-promise -d express-boom -d auth0 -d memory-cache -d web-push -d babel-runtime
     wt update github webtasks/github.js -p newrelease -d express-boom -d auth0 -d memory-cache
 
 > *Run locally*
