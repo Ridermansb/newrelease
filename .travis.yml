@@ -11,16 +11,14 @@ cache:
 services:
   - docker
 
-install:
-  - npm install
+install: npm install
 
-script:
-  - npm run build -- -p
+script: npm run build -- -p
 
+before_deploy: "echo 'ready?'"
 deploy:
   provider: heroku
   api-key:
     secure: $HEROKU_API_KEY
-  branches:
-    only:
-        - master
+  on:
+    branch: master
