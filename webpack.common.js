@@ -16,7 +16,7 @@ const { resolve } = require('path');
 
 require('dotenv').config();
 
-const PUBLIC_PATH = process.env.PUBLIC_PATH || 'https://www.my-domain.com/';
+const PUBLIC_PATH = process.env.PUBLIC_PATH || 'https://ui-newrelease.wedeploy.io';
 const gitRevisionPlugin = new GitRevisionPlugin();
 
 module.exports = {
@@ -28,8 +28,8 @@ module.exports = {
     new webpack.EnvironmentPlugin({
       NODE_ENV: 'development',
       GITHUB_API_URI: 'https://api.github.com',
-      DOMAIN: '',
-      CLIENTID: '',
+      AUTH0_DOMAIN: '',
+      AUTH0_CLIENTID: '',
       VAPID_PUBLIC: 'BCeOKPz2URgJ8Fak0qnc8AHTIOsClIppC_Eup432IZTAx3SEhgYJa-P-bch8dOdCPfMgnIZeKYXzASvaYqbM0RE',
     }),
     new webpack.ProvidePlugin({

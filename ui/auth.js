@@ -2,15 +2,16 @@ import auth0 from 'auth0-js';
 import { uiStore } from 'store';
 import history from './history';
 
-const CLIENTID = process.env.CLIENTID;
-const DOMAIN = process.env.DOMAIN;
+const AUTH0_CLIENTID = process.env.AUTH0_CLIENTID;
+const AUTH0_DOMAIN = process.env.AUTH0_DOMAIN;
+const DOMAIN = process.env.DOMAIN || 'http://localhost:3000';
 
 export class Auth {
   webAuth0 = new auth0.WebAuth({
-    domain: DOMAIN,
-    clientID: CLIENTID,
-    redirectUri: 'http://localhost:3000/callback',
-    audience: `https://${DOMAIN}/userinfo`,
+    domain: AUTH0_DOMAIN,
+    clientID: AUTH0_CLIENTID,
+    redirectUri: `${DOMAIN}/callback`,
+    audience: `https://${AUTH0_DOMAIN}/userinfo`,
     responseType: 'token id_token',
     scope: 'openid identities profile email read:user_idp_tokens',
     theme: {
