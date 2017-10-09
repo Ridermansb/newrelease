@@ -1,7 +1,5 @@
 >  WIP
 
-[![Deploy to Docker Cloud](https://files.cloud.docker.com/images/deploy-to-dockercloud.svg)](https://cloud.docker.com/stack/deploy/?repo=ridermansb/newrelease)
-
  * **Create new WebTask**  
  First create a new file `.env.auth0` with all secrets (Check the `webtask/github`).
    
@@ -22,6 +20,11 @@
 
     now --dotenv --public --docker
     now alias xpvB6GZWMR6Q9Oxe3c64Htgq newrelease
+    
+    npm run build
+    docker build -t registry.heroku.com/${YOUR_APP_NAME}/web .
+    docker push registry.heroku.com/${YOUR_APP_NAME}/web
+    heroku container:push web --app
 
 ## Design
 
