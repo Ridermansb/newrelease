@@ -30,6 +30,7 @@ module.exports = {
       GITHUB_API_URI: 'https://api.github.com',
       AUTH0_DOMAIN: '',
       AUTH0_CLIENTID: '',
+      BASE_URL: 'http://localhost:3000',
       VAPID_PUBLIC: 'BCeOKPz2URgJ8Fak0qnc8AHTIOsClIppC_Eup432IZTAx3SEhgYJa-P-bch8dOdCPfMgnIZeKYXzASvaYqbM0RE',
     }),
     new webpack.ProvidePlugin({

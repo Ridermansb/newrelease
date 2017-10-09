@@ -4,13 +4,13 @@ import history from './history';
 
 const AUTH0_CLIENTID = process.env.AUTH0_CLIENTID;
 const AUTH0_DOMAIN = process.env.AUTH0_DOMAIN;
-const DOMAIN = process.env.DOMAIN || 'http://localhost:3000';
+const BASE_URL = process.env.BASE_URL;
 
 export class Auth {
   webAuth0 = new auth0.WebAuth({
     domain: AUTH0_DOMAIN,
     clientID: AUTH0_CLIENTID,
-    redirectUri: `${DOMAIN}/callback`,
+    redirectUri: `${BASE_URL}/callback`,
     audience: `https://${AUTH0_DOMAIN}/userinfo`,
     responseType: 'token id_token',
     scope: 'openid identities profile email read:user_idp_tokens',

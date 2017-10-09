@@ -32,7 +32,7 @@ const App = withRouter(({ location }) => (
       exact
       path="/"
       render={(props) => {
-        if (uiStore.isAuthenticated) {
+        if (uiStore.isAuthenticated && !uiStore.isAuthenticating) {
           return <HomePage {...props} />;
         } else if (!uiStore.isAuthenticating) {
           auth.login();
@@ -41,9 +41,9 @@ const App = withRouter(({ location }) => (
       }}
     />
     <Route
-      exact
       path="/callback"
       render={(props) => {
+        uiStore.isAuthenticating = true;
         handleAuthentication(props);
         return <CallbackPage {...props} />;
       }}
