@@ -399,34 +399,29 @@ app.delete('/subscribe/:repoId(\\d+)', (req, res) => {
 
 app.post('/newrelease', (req, res) => {
   const { storage } = req.webtaskContext;
-
   const { repository } = req.body;
 
   storage.get((error, data) => {
-    if (error) {
-      throw error;
-    }
+    if (error) { throw error; }
 
     const payload = JSON.stringify({
-      title: `New version of ${repository.full_name} available`,
+      title: `${repository.full_name} release available`,
       body: repository.description,
       icon: repository.owner.avatar_url,
-      // url: repository.html_url
+      data: {
+        html_url: repository.html_url,
+        updated_at: repository.updated_at,
+      },
+      // tag: repository.id,
     });
     const options = { TTL: 3600 /* 1sec * 60 * 60 = 1h */ };
-    const usersSubscribed = data.users.filter(u => u.subscriptions.includes(repository.id));
-    console.log('Launching push ', usersSubscribed);
+    const usersSubscribed = data.users.filter(u => u.subscriptions.find(s => s === repository.id));
     const pushingPromises = usersSubscribed
       .map(user => webPush.sendNotification(user.subscriptionKeys, payload, options));
     Promise.all(pushingPromises)
       .then(resp => res.json(resp))
       .catch(e => res.boom.badImplementation(e));
   });
-
-  // TODO find all users that subscribe for this repository
-  // Fire push notification for everyone
-
-  res.json({ isOk: true });
 });
 
 app.post('/push/subscribe', (req, res) => {
