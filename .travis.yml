@@ -11,6 +11,12 @@ cache:
 services:
   - docker
 
+install:
+  - npm install
+
+script:
+  - npm run build -- -p
+
 deploy:
   provider: heroku
   api-key:

@@ -4,7 +4,7 @@
   "main": "dist/main.js",
   "scripts": {
     "prepush": "npm run test",
-    "build": "BASE_URL=https://ui-newrelease.wedeploy.io webpack -p --config webpack.prod.js",
+    "build": "webpack --config webpack.prod.js",
     "build:wt": "env-cmd ./.env babel --no-babelrc webtasks/github.js --presets es2015 --plugins=transform-runtime,transform-object-rest-spread,transform-inline-environment-variables > dist/github.js",
     "start": "node webpack.server.js",
     "start:wt": "env-cmd ./.env npx wt serve webtasks/github.js --secrets-file .env.auth0 --hostname localhost --storage-file ./storage.json --port 3001",
