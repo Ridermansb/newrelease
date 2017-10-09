@@ -1,0 +1,7 @@
+{
+  "name": "newrelease",
+  "alias": "newrelease",
+  "dotenv": true,
+  "type": "docker",
+  "public": true
+}

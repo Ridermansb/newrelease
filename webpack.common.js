@@ -109,6 +109,9 @@ module.exports = {
       'window.jQuery': 'jquery',
       WeDeploy: 'WeDeploy',
     }),
+    /* new webpack.optimize.AggressiveSplittingPlugin({
+      maxSize: 1000000,
+    }), */
     // used to split out our sepcified vendor script
     // https://brotzky.co/blog/code-splitting-react-router-webpack-2/
     new webpack.optimize.CommonsChunkPlugin({

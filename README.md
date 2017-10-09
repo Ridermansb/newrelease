@@ -18,6 +18,11 @@
 
     wt serve webtasks/github.js --secrets-file .env.auth0 --storage-file ./storage.json --hostname localhost --port 3001
 
+> *Publishing*
+
+    now --dotenv --public --docker
+    now alias xpvB6GZWMR6Q9Oxe3c64Htgq newrelease
+
 ## Design
 
  * [Black][2] and [White][3] icons based on Twitter UI
