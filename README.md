@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/Ridermansb/newrelease.svg?branch=master)](https://travis-ci.org/Ridermansb/newrelease)
+
 >  WIP
 
  * **Create new WebTask**  

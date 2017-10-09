@@ -13,8 +13,8 @@ services:
 
 deploy:
   provider: heroku
+  api-key:
+    secure: $HEROKU_API_KEY
   branches:
     only:
         - master
-  api_key:
-    secure: "YOUR ENCRYPTED API KEY"
