@@ -38,6 +38,7 @@ module.exports = {
       Promise: 'imports-loader?this=>global!exports-loader?global.Promise!es6-promise',
       fetch: 'imports-loader?this=>global!exports-loader?global.fetch!whatwg-fetch',
     }),
+    new webpack.optimize.ModuleConcatenationPlugin(),
     new WebpackPwaManifest({
       name: 'New Release',
       short_name: 'New Release',
