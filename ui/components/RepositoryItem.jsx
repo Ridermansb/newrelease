@@ -11,7 +11,6 @@ import Markdown from './Markdown';
 const setVersionInfo = version => state => ({ ...state, version });
 const setIsLoadingRelease = isLoadingRelease => state => ({ ...state, isLoadingRelease });
 const setIsRemoving = isRemoving => state => ({ ...state, isRemoving });
-const setReleaseLoaded = releaseLoaded => state => ({ ...state, releaseLoaded });
 
 export default class extends PureComponent {
   static propTypes = {
@@ -25,13 +24,7 @@ export default class extends PureComponent {
     }).isRequired,
   };
 
-  static defaultProps = {
-    owner: undefined,
-    avatar_url: '',
-  };
-
   state = {
-    releaseLoaded: false,
     isRemoving: false,
     isLoadingRelease: false,
   };
@@ -40,8 +33,7 @@ export default class extends PureComponent {
     const self = this;
     this.$accordion.accordion({
       onOpening() {
-        const { releaseLoaded } = self.state;
-        if (!releaseLoaded) {
+        if (!self.releaseLoaded) {
           self.loadRelease();
         }
       },
@@ -59,7 +51,7 @@ export default class extends PureComponent {
       this.setState(setVersionInfo(version));
     } finally {
       this.setState(setIsLoadingRelease(false));
-      this.setState(setReleaseLoaded(true));
+      this.releaseLoaded = true;
     }
   }
 
@@ -82,16 +74,17 @@ export default class extends PureComponent {
     const { repository } = this.props;
     const { version, isLoadingRelease, isRemoving } = this.state;
 
-    const versionInfo = version ? (<span className="date">
-      <i className="tag icon" /> {version.name} at {moment(version.published_at).fromNow()}
-    </span>) : null;
+    const versionInfo = version ? (
+      <span className="date">
+        <i className="tag icon" /> {version.name} at {moment(version.published_at).fromNow()}
+      </span>) : null;
     const versionDescription = version
       ? (<Markdown text={version.body} />)
       : null;
 
     const close = isRemoving
       ? <div className="ui active inline mini loader" />
-      : <i role="presentation" className="close link icon" onClick={this.removeRepository} />;
+      : <i role="presentation" className="close link icon" onKeyPress={this.removeRepository} onClick={this.removeRepository} />;
 
     return (
       <div href={`#${repository.full_name}`} className="event">

@@ -8,12 +8,14 @@ const styles = {
   },
 };
 
-const RootContainer = ({ children }) => (<div>
-  <Menu className="top pointing fix" />
-  <div className="ui container" style={styles.page}>
-    {children}
+const RootContainer = ({ children }) => (
+  <div>
+    <Menu className="top pointing fix" />
+    <div className="ui container" style={styles.page}>
+      {children}
+    </div>
   </div>
-</div>);
+);
 
 RootContainer.propTypes = {
   children: PropTypes.oneOfType([

@@ -26,12 +26,16 @@ export default class extends React.Component {
     const { isLoadingRepositories } = this.state;
     const { repositories } = domainStore;
 
-    return (<div className="ui small feed">
-      {isLoadingRepositories && <div className="ui active inverted dimmer">
-        <div className="ui text loader">Loading repositories</div>
-      </div>}
-      {repositories &&
-        repositories.map(r => <RepositoryItem key={r.id} repository={r} />)}
-    </div>);
+    return (
+      <div className="ui small feed">
+        {isLoadingRepositories &&
+          <div className="ui active inverted dimmer">
+            <div className="ui text loader">Loading repositories</div>
+          </div>
+        }
+        {repositories &&
+          repositories.map(r => <RepositoryItem key={r.id} repository={r} />)}
+      </div>
+    );
   }
 }

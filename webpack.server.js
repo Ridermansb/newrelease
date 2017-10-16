@@ -13,7 +13,6 @@ require('dotenv').config();
 
 const host = 'localhost';
 const port = 3000;
-const apiPort = process.env.API_PORT || 3001;
 
 const srcFolder = resolve(__dirname, 'src');
 const certFolder = resolve(__dirname, '../ssl');
@@ -41,7 +40,7 @@ const devServer = new WebpackDevServer(compiler, {
   */
   proxy: {
     '/api/**': {
-      target: `http://localhost:${apiPort}`, // `http://[::1]:${apiPort}`
+      target: 'http://localhost:5000/repository-newrelease/us-central1', // `http://[::1]:${apiPort}`
       pathRewrite: { '^/api': '' },
     },
   },
@@ -65,6 +64,6 @@ compiler.plugin('done', () => {
   if (initialCompile) {
     initialCompile = false;
     debug('=> Development server is running on port %s', port);
-    debug('=> Proxy to API on port %s', apiPort);
+    debug('=> Proxy to API on port %s', 5000);
   }
 });

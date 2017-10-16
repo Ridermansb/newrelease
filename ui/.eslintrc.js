@@ -11,7 +11,6 @@ module.exports = {
     ecmaFeatures: {'jsx': true},
   },
   globals: {
-    GITHUB_API_URI: true,
     '$': true
   },
   plugins: ['react', 'jsx-a11y']

@@ -1,5 +1,6 @@
 
-const GITHUB_API_URI = process.env.GITHUB_API_URI;
+// eslint-disable-next-line prefer-destructuring
+const BASE_API_URL = process.env.BASE_API_URL;
 
 const fetchHeaders = {
   'Content-Type': 'application/json',
@@ -28,31 +29,22 @@ async function parseJSON(response) {
   return jsonObj;
 }
 
-export function getPublicRepositories() {
-  const headers = Object.assign({}, fetchHeaders, {
-    Accept: 'application/vnd.github.mercy-preview+json',
-  });
-  return fetch(`${GITHUB_API_URI}/repositories`, {
-    method: 'GET',
-    headers,
-  }).then(checkStatus).then(parseJSON);
-}
 export function getUserRepositories() {
-  return fetch('/api/user/repos', {
+  return fetch(`/${BASE_API_URL}/user/repos`, {
     method: 'GET',
     headers: getWebtaskHeaders(),
   }).then(checkStatus).then(parseJSON);
 }
 
 export function getLatestReleaseRepository(owner, repo) {
-  return fetch(`/api/repos/${owner}/${repo}/releases/latest`, {
+  return fetch(`/${BASE_API_URL}/repos/${owner}/${repo}/releases/latest`, {
     method: 'GET',
     headers: getWebtaskHeaders(),
   }).then(checkStatus).then(parseJSON);
 }
 
 export function addHookToRepository(id, owner, repo) {
-  return fetch(`/api/repos/${owner}/${repo}/hooks`, {
+  return fetch(`/${BASE_API_URL}/repos/${owner}/${repo}/hooks`, {
     method: 'POST',
     body: JSON.stringify({ id }),
     headers: getWebtaskHeaders(),
@@ -60,28 +52,28 @@ export function addHookToRepository(id, owner, repo) {
 }
 
 export function getHook(owner, repo) {
-  return fetch(`/api/repos/${owner}/${repo}/hook`, {
+  return fetch(`/${BASE_API_URL}/repos/${owner}/${repo}/hook`, {
     method: 'GET',
     headers: getWebtaskHeaders(),
   }).then(checkStatus).then(parseJSON);
 }
 
 export function subscribe(repoId) {
-  return fetch(`/api/subscribe/${repoId}`, {
+  return fetch(`/${BASE_API_URL}/subscribe/${repoId}`, {
     method: 'POST',
     headers: getWebtaskHeaders(),
   }).then(checkStatus).then(parseJSON);
 }
 
 export function unsubscribe(repoId) {
-  return fetch(`/api/subscribe/${repoId}`, {
+  return fetch(`/${BASE_API_URL}/subscribe/${repoId}`, {
     method: 'DELETE',
     headers: getWebtaskHeaders(),
   }).then(checkStatus).then(parseJSON);
 }
 
 export function createSuggestionIssue(id, owner, repo) {
-  return fetch(`/api/repos/${owner}/${repo}/issues/`, {
+  return fetch(`/${BASE_API_URL}/repos/${owner}/${repo}/issues/`, {
     method: 'POST',
     body: JSON.stringify({ id }),
     headers: getWebtaskHeaders(),
@@ -89,14 +81,14 @@ export function createSuggestionIssue(id, owner, repo) {
 }
 
 export function fetchRepositoriesSubscribed() {
-  return fetch('/api/subscribed', {
+  return fetch(`/${BASE_API_URL}/subscribed`, {
     method: 'GET',
     headers: getWebtaskHeaders(),
   }).then(checkStatus).then(parseJSON);
 }
 
 export function subscribeToPushNotification(subscription) {
-  return fetch('/api/push/subscribe', {
+  return fetch(`/${BASE_API_URL}/push/subscribe`, {
     method: 'POST',
     body: JSON.stringify(subscription),
     headers: getWebtaskHeaders(),
@@ -104,7 +96,7 @@ export function subscribeToPushNotification(subscription) {
 }
 
 export function unsubscribeToPushNotification() {
-  return fetch('/api/push/subscribe', {
+  return fetch(`/${BASE_API_URL}/push/subscribe`, {
     method: 'DELETE',
     headers: getWebtaskHeaders(),
   }).then(checkStatus).then(parseJSON);

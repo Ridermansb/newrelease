@@ -66,12 +66,14 @@ export default class extends PureComponent {
   }
 
   render() {
-    return (<div className="ui small search" ref={(el) => { this.$searchField = $(el); }}>
-      <div className="ui left icon input">
-        <i className="github icon" />
-        <input className="prompt" type="text" placeholder="Repository name..." />
+    return (
+      <div className="ui small search" ref={(el) => { this.$searchField = $(el); }}>
+        <div className="ui left icon input">
+          <i className="github icon" />
+          <input className="prompt" type="text" placeholder="Repository name..." />
+        </div>
+        <div className="results" />
       </div>
-      <div className="results" />
-    </div>);
+    );
   }
 }

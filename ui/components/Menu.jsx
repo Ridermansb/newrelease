@@ -84,51 +84,52 @@ export default class extends React.PureComponent {
     const { className } = this.props;
     const { currentUser } = uiStore;
 
-    return (<div className={`ui borderless ${className} attached stackable menu`}>
+    return (
+      <div className={`ui borderless ${className} attached stackable menu`}>
+        <div className="ui modal" ref={(el) => { this.$askSubscription = $(el); }}>
+          <div className="header">Repository add successfully</div>
+          <div className="content">
+            You want to subscribe on any new release?
+          </div>
+          <div className="actions">
+            <div className="ui deny button">No</div>
+            <div className="ui positive button">Yes</div>
+          </div>
+        </div>
+        <div className="ui modal" ref={(el) => { this.$suggestIntegration = $(el); }}>
+          <div className="header">Repository not ready</div>
+          <div className="content">
+            The owner of this repository does not configure yet, do you want to suggest him?
+          </div>
+          <div className="actions">
+            <div className="ui deny button">Not now</div>
+            <div className="ui positive button">Yes, send suggestion</div>
+          </div>
+        </div>
 
-      <div className="ui modal" ref={(el) => { this.$askSubscription = $(el); }}>
-        <div className="header">Repository add successfully</div>
-        <div className="content">
-          You want to subscribe on any new release?
-        </div>
-        <div className="actions">
-          <div className="ui deny button">No</div>
-          <div className="ui positive button">Yes</div>
-        </div>
-      </div>
-      <div className="ui modal" ref={(el) => { this.$suggestIntegration = $(el); }}>
-        <div className="header">Repository not ready</div>
-        <div className="content">
-          The owner of this repository does not configure yet, do you want to suggest him?
-        </div>
-        <div className="actions">
-          <div className="ui deny button">Not now</div>
-          <div className="ui positive button">Yes, send suggestion</div>
-        </div>
-      </div>
-
-      <div className="ui container">
-        <a href="/" className="header item">
-          <img src={logo} alt="Logo" className="ui avatar image" /> New Release
-        </a>
-        <div className="item">
-          <SearchRepository onRepositorySelected={this.repositorySelected} />
-        </div>
-        <div className="right menu">
-          <div
-            className="ui item inline dropdown"
-            ref={((el) => { this.$dropDownUser = $(el); })}
-          >
-            <img className="ui avatar image" src={currentUser.picture} alt="User avatar" />
-            <i className="dropdown icon" />
-            <div className="menu">
-              <button className="item" onClick={this.logoutClick} >
-                <i className="icon sign out" /> Logout
-              </button>
+        <div className="ui container">
+          <a href="/" className="header item">
+            <img src={logo} alt="Logo" className="ui avatar image" /> New Release
+          </a>
+          <div className="item">
+            <SearchRepository onRepositorySelected={this.repositorySelected} />
+          </div>
+          <div className="right menu">
+            <div
+              className="ui item inline dropdown"
+              ref={((el) => { this.$dropDownUser = $(el); })}
+            >
+              <img className="ui avatar image" src={currentUser.picture} alt="User avatar" />
+              <i className="dropdown icon" />
+              <div className="menu">
+                <button className="item" onClick={this.logoutClick} >
+                  <i className="icon sign out" /> Logout
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>);
+    );
   }
 }

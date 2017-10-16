@@ -2,8 +2,11 @@ import auth0 from 'auth0-js';
 import { uiStore } from 'store';
 import history from './history';
 
+// eslint-disable-next-line prefer-destructuring
 const AUTH0_CLIENTID = process.env.AUTH0_CLIENTID;
+// eslint-disable-next-line prefer-destructuring
 const AUTH0_DOMAIN = process.env.AUTH0_DOMAIN;
+// eslint-disable-next-line prefer-destructuring
 const BASE_URL = process.env.BASE_URL;
 
 export class Auth {

@@ -16,22 +16,24 @@ const { resolve } = require('path');
 
 require('dotenv').config();
 
-const PUBLIC_PATH = process.env.PUBLIC_PATH || 'https://ui-newrelease.wedeploy.io';
+const PUBLIC_PATH = process.env.PUBLIC_PATH || 'https://repository-newrelease.firebaseapp.com';
 const gitRevisionPlugin = new GitRevisionPlugin();
 
 module.exports = {
   entry: {
-    vendor: ['react', 'react-dom', 'jquery', 'semantic-ui-css'],
+    vendor: ['react', 'react-dom', 'jquery', 'semantic-ui-css', 'firebase'],
     sw: './ui/sw.js',
   },
   plugins: [
     new webpack.EnvironmentPlugin({
       NODE_ENV: 'development',
-      GITHUB_API_URI: 'https://api.github.com',
       AUTH0_DOMAIN: '',
       AUTH0_CLIENTID: '',
       BASE_URL: 'http://localhost:3000',
+      BASE_API_URL: 'api',
       VAPID_PUBLIC: 'BCeOKPz2URgJ8Fak0qnc8AHTIOsClIppC_Eup432IZTAx3SEhgYJa-P-bch8dOdCPfMgnIZeKYXzASvaYqbM0RE',
+      FIREBASE_WEBAPI_KEY: '',
+      FIREBASE_PROJECT_ID: 'repository-newrelease',
     }),
     new webpack.ProvidePlugin({
       // From http://madole.xyz/using-webpack-to-set-up-polyfills-in-your-site/
@@ -47,7 +49,6 @@ module.exports = {
       related_applications: [{
         platform: 'web',
         id: 'web',
-        // url: PUBLIC_PATH,
       }],
       description: 'Be notified for new repository releases',
       background_color: '#0296d3',
@@ -108,7 +109,6 @@ module.exports = {
       $: 'jquery',
       jQuery: 'jquery',
       'window.jQuery': 'jquery',
-      WeDeploy: 'WeDeploy',
     }),
     /* new webpack.optimize.AggressiveSplittingPlugin({
       maxSize: 1000000,
@@ -134,6 +134,7 @@ module.exports = {
         return count >= 2;
       },
     }),
+    new webpack.HashedModuleIdsPlugin(),
   ],
   resolve: {
     extensions: ['.js', '.jsx'],

@@ -16,9 +16,3 @@ install: npm install
 script: npm run build -- -p
 
 before_deploy: "echo 'ready?'"
-deploy:
-  provider: heroku
-  api-key:
-    secure: $HEROKU_API_KEY
-  on:
-    branch: master

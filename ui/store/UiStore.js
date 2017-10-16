@@ -29,7 +29,9 @@ export default class UiStore {
     this.expiresAt = new Date().getTime();
   }
 
-  @action setLogin({ accessToken, idToken, expiresAt, profile }) {
+  @action setLogin({
+    accessToken, idToken, expiresAt, profile,
+  }) {
     localStorage.setItem('access_token', accessToken);
     localStorage.setItem('id_token', idToken);
     localStorage.setItem('expires_at', expiresAt);

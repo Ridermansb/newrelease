@@ -268,4 +268,4 @@ $RECYCLE.BIN/
 
 .env.*
 storage.json
-dist/github.js
+dist/

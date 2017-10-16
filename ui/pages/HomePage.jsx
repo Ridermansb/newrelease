@@ -7,6 +7,7 @@ import demo from 'assets/images/enable-notification.png';
 import RootContainer from '../containers/RootContainer';
 import logo from '../../favicon.png';
 
+// eslint-disable-next-line prefer-destructuring
 const VAPID_PUBLIC = process.env.VAPID_PUBLIC;
 
 function urlB64ToUint8Array(base64String) {
@@ -37,7 +38,6 @@ export default class extends PureComponent {
 
   state = {
     subscription: false,
-    hasSupport: false,
   };
 
   async componentWillMount() {
@@ -104,29 +104,33 @@ export default class extends PureComponent {
   }
 
   render() {
-    const { subscription,
+    const {
+      subscription,
       isEnablingNotification,
-      isWaitingToAllowNotifications } = this.state;
+      isWaitingToAllowNotifications,
+    } = this.state;
 
     const enableNotificationsButton = cx('ui primary', {
       loading: isEnablingNotification,
     }, 'button');
 
-    return (<RootContainer>
-      {!subscription && <h2 className="ui center aligned icon header">
-        <img src={logo} className="ui image" alt="Logo" />
-        <div className="content">
-          Enable push notification on your browser
-          <div className="sub header">To be able notify you, we need be able to send notifications over chrome.</div>
-          {isWaitingToAllowNotifications &&
-            <img src={demo} className="ui bordered rounded centered image" alt="Demo how to enable notification" />
-          }
-          <button className={enableNotificationsButton} onClick={this.enablePushNotification}>
-            Enable notifications
-          </button>
-        </div>
-      </h2>}
-      {subscription && <RepositoriesList />}
-    </RootContainer>);
+    return (
+      <RootContainer>
+        {!subscription &&
+        <h2 className="ui center aligned icon header">
+          <img src={logo} className="ui image" alt="Logo" />
+          <div className="content">
+            Enable push notification on your browser
+            <div className="sub header">To be able notify you, we need be able to send notifications over chrome.</div>
+            {isWaitingToAllowNotifications &&
+              <img src={demo} className="ui bordered rounded centered image" alt="Demo how to enable notification" />
+            }
+            <button className={enableNotificationsButton} onClick={this.enablePushNotification}>
+              Enable notifications
+            </button>
+          </div>
+        </h2>}
+        {subscription && <RepositoriesList />}
+      </RootContainer>);
   }
 }

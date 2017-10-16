@@ -9,8 +9,7 @@ export class RootStore {
 }
 
 const singleton = new RootStore();
-const uiStore = singleton.uiStore;
-const domainStore = singleton.domainStore;
+const { uiStore, domainStore } = singleton;
 
 export { uiStore, domainStore };
 
